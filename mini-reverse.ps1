@@ -51,4 +51,4 @@ do
 }While (!$out.equals("exit"))
 $writer.close();
 $socket.close();
-$stream.Dispose();
+$stream.Dispose()
